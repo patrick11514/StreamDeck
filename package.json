@@ -36,6 +36,8 @@
     },
     "type": "module",
     "dependencies": {
+        "@elgato-stream-deck/node": "^6.0.0",
+        "@patrick115/sveltekitapi": "^1.2.2",
         "dotenv": "^16.4.5",
         "zod": "^3.22.4"
     }
