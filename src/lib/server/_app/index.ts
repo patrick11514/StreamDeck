@@ -1,9 +1,8 @@
-import { procedure, router } from '../api'
+import { router } from '../api'
+import { deck } from './deck'
 
 export const Router = router({
-    example: procedure.GET.query(() => {
-        return 'Hello' as const
-    })
+    deck
 })
 
 export type AppRouter = typeof Router

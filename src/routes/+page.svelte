@@ -3,7 +3,9 @@
     import { onMount } from 'svelte'
 
     onMount(async () => {
-        console.log(await API.example())
+        const data = await API.deck.device.GET()
+
+        console.log(data)
     })
 </script>
 
