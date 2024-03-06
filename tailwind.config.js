@@ -4,6 +4,10 @@ export default {
     darkMode: 'class',
     theme: {
         extend: {
+            fontFamily: {
+                poppins: ['Poppins', 'sans-serif'],
+                ubuntu: ['Ubuntu', 'sans-serif']
+            },
             colors: {
                 text: '#070709',
                 background: '#fcfcfd',

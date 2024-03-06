@@ -39,6 +39,7 @@
         "@elgato-stream-deck/node": "^6.0.0",
         "@patrick115/sveltekitapi": "^1.2.2",
         "dotenv": "^16.4.5",
+        "tailwind-merge": "^2.2.1",
         "zod": "^3.22.4"
     }
 }
