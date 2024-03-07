@@ -7,6 +7,6 @@
     API.hydrateFromServer(data.api)
 </script>
 
-<div class="font-ubuntu h-full min-h-screen w-full bg-background">
+<div class="h-full min-h-screen w-full bg-background font-ubuntu">
     <slot />
 </div>

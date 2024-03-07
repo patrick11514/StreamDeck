@@ -1,8 +1,9 @@
 <script lang="ts">
+    import type { StreamDeckProperties } from '$/types/types'
     import { API } from '$lib/client'
     import { SwalAlert, defferedWritable } from '$lib/functions'
-    import type { StreamDeckProperties } from '$types/types'
     import { onMount } from 'svelte'
+    import Key from './key.svelte'
 
     export let data: StreamDeckProperties
 
@@ -41,9 +42,23 @@
 </script>
 
 <section class="flex w-full flex-row">
-    <div>
-        <input min={0} max={100} type="range" bind:value={$brightness} />
-        {$brightness}
+    <div class="flex flex-col">
+        <div>
+            <h2 class="font-poppins text-xl font-medium">Brightness</h2>
+            <div class="flex flex-row items-center gap-4">
+                <input min={0} max={100} type="range" bind:value={$brightness} />
+                <span class="font-medium">{$brightness}%</span>
+            </div>
+        </div>
+        <div class="flex flex-col gap-2">
+            {#each Array.from({ length: data.rows }) as _, i}
+                <div class="flex flex-row gap-2">
+                    {#each Array.from({ length: data.cols }) as _, j}
+                        <Key id={i * data.cols + j} size={data.iconSize} />
+                    {/each}
+                </div>
+            {/each}
+        </div>
     </div>
     <div class="ml-auto">
         <h2 class="mx-auto w-max border-b-4 border-b-text font-poppins text-2xl font-medium">StreamDeck info</h2>
@@ -56,6 +71,10 @@
                 <tr class="text-xl font-medium">
                     <td>Serial number:</td>
                     <td class="pl-2 font-normal">{data.serial}</td>
+                </tr>
+                <tr class="text-xl font-medium">
+                    <td>Icon size:</td>
+                    <td class="pl-2 font-normal">{data.iconSize} px</td>
                 </tr>
             </tbody>
         </table>

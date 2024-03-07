@@ -1,9 +1,9 @@
-import { configFileSchema, type ConfigFileSchema } from '$types/types'
+import { configFileSchema, type ConfigFileSchema } from '$/types/types'
 import fs from 'node:fs'
 import path from 'node:path'
 
 export class StreamDeckConfig {
-    private serial: string
+    public serial: string
     private filePath: string
     private content: ConfigFileSchema
 
@@ -30,6 +30,8 @@ export class StreamDeckConfig {
         const result = configFileSchema.safeParse(JSON.parse(data))
 
         if (!result.success) {
+            console.error(result.error)
+
             throw new Error('Could not parse config file')
         }
 
@@ -41,5 +43,30 @@ export class StreamDeckConfig {
         data.brightness = brightness
 
         fs.writeFileSync(this.filePath, JSON.stringify(data))
+    }
+
+    setKey(keyIndex: number) {
+        const data = this.content
+        if (!data.keys) {
+            data.keys = {}
+        }
+
+        data.keys[keyIndex] = {}
+
+        fs.writeFileSync(this.filePath, JSON.stringify(data))
+    }
+
+    getKey(keyIndex: number): false | object {
+        const data = this.content
+
+        if (!data.keys) {
+            return false
+        }
+
+        return data.keys[keyIndex]
+    }
+
+    getKeys() {
+        return this.content.keys
     }
 }

@@ -5,7 +5,7 @@ const t = new APICreate<Context>()
 
 export const router = t.router
 export const procedure = t.procedure
-export const proctedProcedure = procedure.use(async ({ ctx, next }) => {
+export const protectedProcedure = procedure.use(async ({ ctx, next }) => {
     if (!ctx.connected) {
         throw new MiddleWareError({
             status: false,
@@ -17,7 +17,5 @@ export const proctedProcedure = procedure.use(async ({ ctx, next }) => {
     return next({
         ...ctx,
         connected: true
-    } as Required<typeof ctx> & {
-        connected: true
-    })
+    } as typeof ctx)
 })

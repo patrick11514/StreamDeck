@@ -1,8 +1,8 @@
 <script lang="ts">
+    import type { StreamDeckProperties } from '$/types/types'
     import { browser } from '$app/environment'
     import { API } from '$lib/client'
     import { SwalAlert } from '$lib/functions'
-    import type { StreamDeckProperties } from '$types/types'
     import type { StreamDeckDeviceInfo } from '@elgato-stream-deck/node/dist/device'
     import { onMount } from 'svelte'
     import Button from '../components/button.svelte'

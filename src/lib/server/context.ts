@@ -1,23 +1,40 @@
 import { type StreamDeck } from '@elgato-stream-deck/node'
 import type { AsyncReturnType, CreateContext } from '@patrick115/sveltekitapi'
 import { StreamDeckConfig } from './streamdeckConfig'
+import { initializeDevice } from './variables'
 
 export let device: undefined | StreamDeck = undefined
 export let db: undefined | StreamDeckConfig = undefined
+let serial = ''
 
-export const updateDevice = (newDevice: StreamDeck) => {
+export const updateDevice = async (newDevice: StreamDeck) => {
     device = newDevice
+    serial = await device.getSerialNumber()
+
+    await initializeDevice(device, openDB(serial))
 }
 
 export const openDB = (serial: string) => {
-    db = new StreamDeckConfig(serial)
+    return (db = new StreamDeckConfig(serial))
 }
 
 export const closeDevice = () => {
+    device?.removeAllListeners()
+    device?.clearPanel()
     device = undefined
 }
 
-export const createContext = (async () => {
+export const createContext = (async (): Promise<
+    | {
+          connected: false
+      }
+    | {
+          connected: true
+          device: StreamDeck
+          db: StreamDeckConfig
+          serial: string
+      }
+> => {
     if (!device || !db) {
         return {
             connected: false
@@ -30,7 +47,8 @@ export const createContext = (async () => {
         return {
             connected: true,
             device,
-            db
+            db,
+            serial
         }
     } catch (_) {
         closeDevice()

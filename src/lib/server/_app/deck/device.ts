@@ -1,6 +1,6 @@
-import { procedure, proctedProcedure } from '$lib/server/api'
-import { closeDevice as cls, device, openDB, updateDevice } from '$lib/server/context'
-import { configFileSchema, type ConfigFileSchema, type Response, type ResponseWithData, type StreamDeckProperties } from '$types/types'
+import { configFileSchema, type ConfigFileSchema, type Response, type ResponseWithData, type StreamDeckProperties } from '$/types/types'
+import { procedure, protectedProcedure } from '$lib/server/api'
+import { closeDevice as cls, device, updateDevice } from '$lib/server/context'
 import { listStreamDecks, openStreamDeck } from '@elgato-stream-deck/node'
 import type { ErrorApiResponse } from '@patrick115/sveltekitapi'
 import fs from 'node:fs'
@@ -21,15 +21,16 @@ const devices = procedure.GET.query(async ({ ctx }) => {
               data: StreamDeckProperties
           }
 
-    if (data.connected) {
-        const dev = ctx.device!
+    if (data.connected && ctx.connected) {
+        const dev = ctx.device
 
         data.data = {
             firmware: await dev.getFirmwareVersion(),
-            serial: await dev.getSerialNumber(),
+            serial: ctx.serial,
             rows: dev.KEY_ROWS,
             cols: dev.KEY_COLUMNS,
-            name: dev.PRODUCT_NAME
+            name: dev.PRODUCT_NAME,
+            iconSize: dev.ICON_SIZE
         }
     }
 
@@ -86,8 +87,6 @@ const select = procedure.PUT.input(z.string()).query(async ({ input, ctx }) => {
 
     const serial = await dev.getSerialNumber()
 
-    openDB(serial)
-
     return {
         status: true,
         data: {
@@ -95,12 +94,13 @@ const select = procedure.PUT.input(z.string()).query(async ({ input, ctx }) => {
             serial,
             rows: dev.KEY_ROWS,
             cols: dev.KEY_COLUMNS,
-            name: dev.PRODUCT_NAME
+            name: dev.PRODUCT_NAME,
+            iconSize: dev.ICON_SIZE
         }
     } satisfies ResponseWithData<StreamDeckProperties>
 })
 
-const loadInfo = proctedProcedure.POST.input(z.string()).query(async ({ input, ctx }) => {
+const loadInfo = protectedProcedure.POST.input(z.string()).query(async ({ input, ctx }) => {
     if (!fs.existsSync('configs')) {
         fs.mkdirSync('configs')
     }
@@ -158,7 +158,7 @@ const loadInfo = proctedProcedure.POST.input(z.string()).query(async ({ input, c
     } satisfies ErrorApiResponse
 })
 
-const closeDevice = proctedProcedure.DELETE.input(z.any()).query(async () => {
+const closeDevice = protectedProcedure.DELETE.input(z.any()).query(async () => {
     cls()
 
     return {
