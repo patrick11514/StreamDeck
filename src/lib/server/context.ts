@@ -18,9 +18,9 @@ export const openDB = (serial: string) => {
     return (db = new StreamDeckConfig(serial))
 }
 
-export const closeDevice = () => {
+export const closeDevice = async () => {
     device?.removeAllListeners()
-    device?.clearPanel()
+    device?.resetToLogo()
     device = undefined
 }
 

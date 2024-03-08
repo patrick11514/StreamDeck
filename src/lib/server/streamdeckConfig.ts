@@ -56,6 +56,16 @@ export class StreamDeckConfig {
         fs.writeFileSync(this.filePath, JSON.stringify(data))
     }
 
+    existsKey(keyIndex: number) {
+        const data = this.content
+
+        if (!data.keys) {
+            return false
+        }
+
+        return !!data.keys[keyIndex]
+    }
+
     getKey(keyIndex: number): false | object {
         const data = this.content
 

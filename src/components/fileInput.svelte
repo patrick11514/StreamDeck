@@ -1,64 +1,66 @@
 <script lang="ts">
     //https://www.npmjs.com/package/@svelte-parts/drop-file
-    export let onDrop: (files: Array<File | null>) => void;
-    export let onEnter: (() => void) | null = null;
-    export let onLeave: (() => void) | null = null;
+    export let onDrop: (files: Array<File | null>) => void
+    export let onEnter: (() => void) | null = null
+    export let onLeave: (() => void) | null = null
+    export let accept = ''
 
-    let cls = '';
-    export { cls as class };
+    let cls = ''
+    export let style = ''
+    export { cls as class }
 
-    let isOver = false;
-    let input: HTMLInputElement;
+    let isOver = false
+    let input: HTMLInputElement
 
     const handleEnter = () => {
-        isOver = true;
+        isOver = true
         if (onEnter) {
-            onEnter();
+            onEnter()
         }
-    };
+    }
 
     const handleLeave = () => {
-        isOver = false;
+        isOver = false
         if (onLeave) {
-            onLeave();
+            onLeave()
         }
-    };
+    }
 
     const handleDrop = (
         e: DragEvent & {
-            currentTarget: EventTarget & HTMLDivElement;
+            currentTarget: EventTarget & HTMLDivElement
         }
     ) => {
-        e.preventDefault();
+        e.preventDefault()
 
-        let items: Array<DataTransferItem> = [];
+        let items: Array<DataTransferItem> = []
         if (e.dataTransfer?.items) {
-            items = Array.from(e.dataTransfer.items);
+            items = Array.from(e.dataTransfer.items)
         }
-        onDrop(items.map((d) => d.getAsFile()));
-        isOver = false;
-    };
+        onDrop(items.map((d) => d.getAsFile()))
+        isOver = false
+    }
 
     const handleDragOver = (e: DragEvent) => {
-        e.preventDefault();
-    };
+        e.preventDefault()
+    }
 
     const handleChange = (
         e: Event & {
-            currentTarget: EventTarget & HTMLInputElement;
+            currentTarget: EventTarget & HTMLInputElement
         }
     ) => {
-        e.preventDefault();
-        let target = e.target as HTMLInputElement;
+        e.preventDefault()
+        let target = e.target as HTMLInputElement
 
-        onDrop(target.files?.length ? Array.from(target.files) : []);
-    };
+        onDrop(target.files?.length ? Array.from(target.files) : [])
+    }
 </script>
 
 <div
     on:drop={handleDrop}
     on:keydown={() => {
-        return;
+        return
     }}
     on:dragover={handleDragOver}
     on:dragenter={handleEnter}
@@ -67,7 +69,8 @@
     role="button"
     tabindex="0"
     class={cls}
+    {style}
 >
     <slot />
 </div>
-<input style="display:none" type="file" on:change={handleChange} bind:this={input} multiple />
+<input style="display:none" type="file" {accept} on:change={handleChange} bind:this={input} multiple />

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { StreamDeckProperties } from '$/types/types'
+    import type { KeyInfo, StreamDeckProperties } from '$/types/types'
     import { API } from '$lib/client'
     import { SwalAlert, defferedWritable } from '$lib/functions'
     import { onMount } from 'svelte'
@@ -39,6 +39,19 @@
 
         initialized = true
     })
+
+    let currentKeyData: undefined | null | KeyInfo = undefined
+
+    const selectKey = async (key: number) => {
+        const data = await API.deck.key.info(key)
+
+        if (!data.status) {
+            currentKeyData = null
+            return
+        }
+
+        currentKeyData = data.data
+    }
 </script>
 
 <section class="flex w-full flex-row">
@@ -50,15 +63,18 @@
                 <span class="font-medium">{$brightness}%</span>
             </div>
         </div>
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-2 p-2">
             {#each Array.from({ length: data.rows }) as _, i}
                 <div class="flex flex-row gap-2">
                     {#each Array.from({ length: data.cols }) as _, j}
-                        <Key id={i * data.cols + j} size={data.iconSize} />
+                        <Key on:click={() => selectKey(i * data.cols + j)} id={i * data.cols + j} />
                     {/each}
                 </div>
             {/each}
         </div>
+        {#if currentKeyData !== undefined}
+            <div>{JSON.stringify(currentKeyData)}</div>
+        {/if}
     </div>
     <div class="ml-auto">
         <h2 class="mx-auto w-max border-b-4 border-b-text font-poppins text-2xl font-medium">StreamDeck info</h2>

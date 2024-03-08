@@ -17,10 +17,13 @@ export type StreamDeckProperties = {
     iconSize: number
 }
 
+export const keySchema = z.object({})
+
 export const configFileSchema = z.object({
     serial: z.string(),
     brightness: z.number(),
-    keys: z.record(z.string(), z.object({})).optional()
+    keys: z.record(z.string(), keySchema).optional()
 })
 
+export type KeyInfo = z.infer<typeof keySchema>
 export type ConfigFileSchema = z.infer<typeof configFileSchema>
