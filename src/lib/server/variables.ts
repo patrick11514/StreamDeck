@@ -34,13 +34,16 @@ export const initializeDevice = async (device: StreamDeck, db: StreamDeckConfig)
             //@todo
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const data = keys[key]
-            promises.push(
-                (async () => {
-                    const file = await fs.readFile(Path.join(DYNAMIC_IMAGES_FOLDER, db.serial, key + '.png'))
-                    const data = await sharp(file).flatten().resize(device.ICON_SIZE, device.ICON_SIZE).raw().toBuffer()
-                    await device.fillKeyBuffer(parseInt(key), data)
-                })()
-            )
+
+            if (data.icon) {
+                promises.push(
+                    (async () => {
+                        const file = await fs.readFile(Path.join(DYNAMIC_IMAGES_FOLDER, db.serial, key + '.png'))
+                        const data = await sharp(file).flatten().resize(device.ICON_SIZE, device.ICON_SIZE).raw().toBuffer()
+                        await device.fillKeyBuffer(parseInt(key), data)
+                    })()
+                )
+            }
         }
 
         Promise.all(promises)

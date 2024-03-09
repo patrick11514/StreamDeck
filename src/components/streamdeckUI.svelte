@@ -100,6 +100,8 @@
     const removeIcon = async () => {
         if (currentKey === undefined) return
 
+        console.log(currentKey)
+
         const data = await API.deck.key.icon.DELETE(currentKey)
 
         if (!data.status) {

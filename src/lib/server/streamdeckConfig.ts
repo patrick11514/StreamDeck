@@ -38,11 +38,15 @@ export class StreamDeckConfig {
         this.content = result.data
     }
 
+    private _write() {
+        fs.writeFileSync(this.filePath, JSON.stringify(this.content))
+    }
+
     setBrightness(brightness: number) {
         const data = this.content
         data.brightness = brightness
 
-        fs.writeFileSync(this.filePath, JSON.stringify(data))
+        this._write()
     }
 
     setKey(keyIndex: number, kData: KeyInfo) {
@@ -53,7 +57,7 @@ export class StreamDeckConfig {
 
         data.keys[keyIndex] = kData
 
-        fs.writeFileSync(this.filePath, JSON.stringify(data))
+        this._write()
     }
 
     setKeyData<T extends keyof KeyInfo>(keyIndex: number, key: T, value: KeyInfo[T]) {
@@ -67,6 +71,8 @@ export class StreamDeckConfig {
         }
 
         data.keys[keyIndex][key] = value
+
+        this._write()
     }
 
     existsKey(keyIndex: number) {
