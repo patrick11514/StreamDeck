@@ -1,4 +1,4 @@
-import { configFileSchema, type ConfigFileSchema } from '$/types/types'
+import { configFileSchema, type ConfigFileSchema, type KeyInfo } from '$/types/types'
 import fs from 'node:fs'
 import path from 'node:path'
 
@@ -45,15 +45,28 @@ export class StreamDeckConfig {
         fs.writeFileSync(this.filePath, JSON.stringify(data))
     }
 
-    setKey(keyIndex: number) {
+    setKey(keyIndex: number, kData: KeyInfo) {
         const data = this.content
         if (!data.keys) {
             data.keys = {}
         }
 
-        data.keys[keyIndex] = {}
+        data.keys[keyIndex] = kData
 
         fs.writeFileSync(this.filePath, JSON.stringify(data))
+    }
+
+    setKeyData<T extends keyof KeyInfo>(keyIndex: number, key: T, value: KeyInfo[T]) {
+        const data = this.content
+        if (!data.keys) {
+            data.keys = {}
+        }
+
+        if (!data.keys[keyIndex]) {
+            data.keys[keyIndex] = {} as KeyInfo
+        }
+
+        data.keys[keyIndex][key] = value
     }
 
     existsKey(keyIndex: number) {
@@ -66,7 +79,7 @@ export class StreamDeckConfig {
         return !!data.keys[keyIndex]
     }
 
-    getKey(keyIndex: number): false | object {
+    getKey(keyIndex: number): false | KeyInfo {
         const data = this.content
 
         if (!data.keys) {

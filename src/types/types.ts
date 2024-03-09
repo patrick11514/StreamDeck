@@ -17,7 +17,9 @@ export type StreamDeckProperties = {
     iconSize: number
 }
 
-export const keySchema = z.object({})
+export const keySchema = z.object({
+    icon: z.boolean()
+})
 
 export const configFileSchema = z.object({
     serial: z.string(),

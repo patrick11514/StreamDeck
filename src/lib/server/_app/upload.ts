@@ -47,7 +47,7 @@ export const upload = protectedProcedure.POST.input(FormDataInput).query(async (
 
     fs.writeFileSync(path, file)
 
-    ctx.db.setKey(key)
+    ctx.db.setKeyData(key, 'icon', true)
 
     return {
         status: true,

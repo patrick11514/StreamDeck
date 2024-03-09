@@ -39,6 +39,7 @@
     "dependencies": {
         "@elgato-stream-deck/node": "^6.0.0",
         "@patrick115/sveltekitapi": "^1.2.5",
+        "bootstrap-icons": "^1.11.3",
         "dotenv": "^16.4.5",
         "sharp": "^0.33.2",
         "sweetalert2": "^11.10.6",

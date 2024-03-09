@@ -1,17 +1,5 @@
 <script lang="ts">
-    import { API } from '$/lib/client'
-    import { onMount } from 'svelte'
-
-    export let id: number
-    let image: string | undefined = undefined
-
-    onMount(async () => {
-        const data = await API.deck.key.icon(id)
-
-        if (data.status) {
-            image = data.data
-        }
-    })
+    export let image: string | undefined = undefined
 </script>
 
 <button

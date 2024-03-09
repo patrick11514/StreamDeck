@@ -1,5 +1,6 @@
 <script lang="ts">
     import { API } from '$lib/client'
+    import 'bootstrap-icons/font/bootstrap-icons.min.css'
     import '../app.css'
     import type { LayoutServerData } from './$types'
 
