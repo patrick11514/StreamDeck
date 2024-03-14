@@ -138,18 +138,20 @@
         </div>
         {#if currentKeyData !== undefined}
             {JSON.stringify(currentKeyData)}
-            <h2 class="font-poppins text-lg font-medium">Key: {currentKey}</h2>
+            <h2 class="font-poppins text-lg font-medium">Selected key {currentKey}:</h2>
             <div class="flex flex-col">
                 <div class="flex gap-2">
                     <FileInput
                         class="rounded-lg bg-primary px-2 py-1 text-center font-poppins text-lg font-medium text-white transition-colors duration-200 hover:bg-secondary"
                         {onDrop}
                     >
-                        {currentKeyData?.icon === true ? 'Změnit ikonku' : 'Nastavit ikonku'}
+                        {currentKeyData?.icon === true ? 'Change icon' : 'Set icon'}
                     </FileInput>
-                    <button on:click={removeIcon} class="rounded-lg bg-red-500 px-2.5 py-1 transition-colors duration-200 hover:bg-red-600">
-                        <Icon class="text-white" name="bi-trash-fill" />
-                    </button>
+                    {#if currentKeyData?.icon === true}
+                        <button title="Remove icon" on:click={removeIcon} class="rounded-lg bg-red-500 px-2.5 py-1 transition-colors duration-200 hover:bg-red-600">
+                            <Icon class="text-white" name="bi-trash-fill" />
+                        </button>
+                    {/if}
                 </div>
             </div>
         {/if}

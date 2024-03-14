@@ -86,13 +86,14 @@
 
 <section class="flex flex-col p-4">
     {#if devices === undefined}
-        <Message>Načítání</Message>
+        <Message>Loading</Message>
     {:else}
         <div>
             <Select bind:value={selected}>
                 {#if devices.length == 0}
-                    <option disabled value="" selected>Žádné zařízení nebylo nenalezeno</option>
+                    <option disabled value="" selected>No device found.</option>
                 {:else}
+                    <option disabled value="" selected>Plese, select device.</option>
                     {#each devices as device}
                         <option value={device.path}>StreamDeck ({device.model}){device.serialNumber ? ` - ${device.serialNumber}` : ''}</option>
                     {/each}
