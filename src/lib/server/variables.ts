@@ -2,6 +2,7 @@ import type { StreamDeck } from '@elgato-stream-deck/node'
 import fs from 'node:fs/promises'
 import Path from 'node:path'
 import sharp from 'sharp'
+import { device } from './context'
 import type { StreamDeckConfig } from './streamdeckConfig'
 
 export const DYNAMIC_IMAGES_FOLDER = 'images'
@@ -49,3 +50,26 @@ export const initializeDevice = async (device: StreamDeck, db: StreamDeckConfig)
         Promise.all(promises)
     }
 }
+
+//If application stops/crashes, reset streamdeck back to logo
+export const setupCleanUpFunctions = () => {
+    // do app specific cleaning before exiting
+    process.on('exit', function () {
+        if (device !== undefined) {
+            device.resetToLogo()
+        }
+    })
+
+    // catch ctrl+c event and exit normally
+    process.on('SIGINT', function () {
+        process.exit(2)
+    })
+
+    //catch uncaught exceptions, trace, then exit normally
+    process.on('uncaughtException', function (e) {
+        console.log(e.stack)
+        process.exit(99)
+    })
+}
+
+setupCleanUpFunctions()
