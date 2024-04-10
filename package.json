@@ -44,6 +44,7 @@
         "sharp": "^0.33.2",
         "sweetalert2": "^11.10.6",
         "tailwind-merge": "^2.2.1",
+        "ts5api": "link:../TS5API",
         "zod": "^3.22.4"
     }
 }

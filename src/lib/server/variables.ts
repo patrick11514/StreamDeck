@@ -2,6 +2,7 @@ import type { StreamDeck } from '@elgato-stream-deck/node'
 import fs from 'node:fs/promises'
 import Path from 'node:path'
 import sharp from 'sharp'
+import { TeamSpeakHandler } from './actions/TeamSpeakHandler'
 import { device } from './context'
 import type { StreamDeckConfig } from './streamdeckConfig'
 
@@ -13,16 +14,50 @@ export const isValidExtension = (inputExt: string): boolean => {
     return allowedExtensions.includes(inputExt.slice(1) as (typeof allowedExtensions)[number])
 }
 
+let teamspeakHandler: TeamSpeakHandler
+
 export const initializeDevice = async (device: StreamDeck, db: StreamDeckConfig) => {
     //clear panel
     await device.clearPanel()
 
+    if (teamspeakHandler) {
+        teamspeakHandler.connector.disconnect()
+    }
+
+    teamspeakHandler = new TeamSpeakHandler()
+
     //add listeners
     device.addListener('down', (data) => {
-        console.log('down', data)
+        if (!db.existsKey(data)) {
+            return
+        }
+
+        const keyData = db.getKey(data)
+
+        if (!keyData || keyData.action === undefined) {
+            return
+        }
+
+        //handle action
+        if (keyData.action.startsWith('teamspeak')) {
+            teamspeakHandler.handlePress(keyData.action)
+        }
     })
     device.addListener('up', (data) => {
-        console.log('up', data)
+        if (!db.existsKey(data)) {
+            return
+        }
+
+        const keyData = db.getKey(data)
+
+        if (!keyData || keyData.action === undefined) {
+            return
+        }
+
+        //handle action
+        if (keyData.action.startsWith('teamspeak')) {
+            teamspeakHandler.handleRelease(keyData.action)
+        }
     })
 
     //load icons

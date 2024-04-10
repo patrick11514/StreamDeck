@@ -40,8 +40,6 @@ const remove = protectedProcedure.DELETE.input(z.number()).query(async ({ input,
         } satisfies ErrorApiResponse
     }
 
-    console.log(input)
-
     ctx.db.setKeyData(input, 'icon', false)
 
     const path = Path.join(DYNAMIC_IMAGES_FOLDER, ctx.serial, input + '.png')

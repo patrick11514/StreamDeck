@@ -1,3 +1,4 @@
+import { actionSchema } from '$/lib/server/_app/deck/action'
 import { z } from 'zod'
 
 export type Response = {
@@ -18,7 +19,8 @@ export type StreamDeckProperties = {
 }
 
 export const keySchema = z.object({
-    icon: z.boolean()
+    icon: z.boolean(),
+    action: actionSchema.optional()
 })
 
 export const configFileSchema = z.object({

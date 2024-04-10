@@ -1,40 +1,53 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import type { Response, ResponseWithData } from '$/types/types'
 import { z } from 'zod'
+import { TSActions, TSNames } from '../../actions/TeamSpeakHandler'
 import { protectedProcedure } from '../../api'
 
-const data = {
-    teamspeak5: ['mute_mic', 'unmute_mic', 'toggle_mic', 'mute_output', 'unmute_output', 'toggle_output']
-} as const
+const actions = [...TSActions] as const
 
-type Data = typeof data
-type Union = `${keyof Data}:${Data[keyof Data][number]}`
-
-// oh boy don't do this
-type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void ? I : never
-type LastOf<T> = UnionToIntersection<T extends any ? () => T : never> extends () => infer R ? R : never
-
-// TS4.0+
-type Push<T extends any[], V> = [...T, V]
-
-// TS4.1+
-type TuplifyUnion<T, L = LastOf<T>, N = [T] extends [never] ? true : false> = true extends N ? [] : Push<TuplifyUnion<Exclude<T, L>>, L>
-
-type Tuple = TuplifyUnion<Union>
-
-const createArray = (array: Data): Tuple => {
-    const result = []
-
-    for (const key in array) {
-        for (const value of array[key as keyof Data]) {
-            result.push(`${key}:${value}`)
-        }
-    }
-
-    return result as Tuple
+type RemoveReadonly<T> = {
+    -readonly [P in keyof T]: T[P]
 }
 
-const constructArray = createArray(data)
+export type Actions = RemoveReadonly<typeof actions>
 
-const actionName = z.union(constructArray)
+const actionNames = {
+    ...TSNames
+} satisfies Record<Actions[number], string>
 
-export const action = protectedProcedure.POST()
+export const actionSchema = z.enum(actions)
+const schema = z.object({
+    key: z.number(),
+    action: actionSchema
+})
+
+const getActions = protectedProcedure.GET.query(async () => {
+    return {
+        status: true,
+        data: {
+            names: actionNames,
+            actions: actions as Actions
+        }
+    } satisfies ResponseWithData<{
+        names: typeof actionNames
+        actions: Actions
+    }>
+})
+
+const action = protectedProcedure.POST.input(schema).query(async ({ ctx, input }) => {
+    ctx.db.setKeyData(input.key, 'action', input.action)
+
+    return {
+        status: true
+    } satisfies Response
+})
+
+const removeAction = protectedProcedure.DELETE.input(z.number()).query(async ({ ctx, input }) => {
+    ctx.db.setKeyData(input, 'action', undefined)
+
+    return {
+        status: true
+    } satisfies Response
+})
+
+export default [action, getActions, removeAction]

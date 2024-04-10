@@ -1,4 +1,5 @@
 <script lang="ts">
+    import type { Actions } from '$/lib/server/_app/deck/action'
     import type { KeyInfo, StreamDeckProperties } from '$/types/types'
     import { API } from '$lib/client'
     import { SwalAlert, defferedWritable } from '$lib/functions'
@@ -6,6 +7,7 @@
     import Icon from './Icon.svelte'
     import FileInput from './fileInput.svelte'
     import Key from './key.svelte'
+    import Select from './select.svelte'
 
     export let data: StreamDeckProperties
 
@@ -26,6 +28,9 @@
     let initialized = false
     let brightness = defferedWritable(0, updateBrightness, 500)
     let keyImages: (string | undefined)[] = []
+
+    let actionsNames: Record<Actions[number], string> | undefined = undefined
+    let actions = [] as unknown as Actions
 
     onMount(async () => {
         const response = await API.deck.device.POST(data.serial)
@@ -48,6 +53,19 @@
             }
         }
 
+        const response2 = await API.deck.action.GET()
+
+        if (!response2.status) {
+            SwalAlert({
+                icon: 'error',
+                title: response2.message
+            })
+            return
+        }
+
+        actions = response2.data.actions
+        actionsNames = response2.data.names
+
         initialized = true
     })
 
@@ -61,10 +79,12 @@
 
         if (!data.status) {
             currentKeyData = null
+            selectedAction = undefined
             return
         }
 
         currentKeyData = data.data
+        selectedAction = data.data?.action
     }
 
     const onDrop = async (files: (File | null)[]) => {
@@ -99,9 +119,6 @@
 
     const removeIcon = async () => {
         if (currentKey === undefined) return
-
-        console.log(currentKey)
-
         const data = await API.deck.key.icon.DELETE(currentKey)
 
         if (!data.status) {
@@ -115,6 +132,49 @@
         keyImages[currentKey] = undefined
 
         selectKey(currentKey)
+    }
+
+    let selectedAction: Actions[number] | undefined = undefined
+
+    const updateAction = async (selectedAction: Actions[number] | undefined) => {
+        if (!selectedAction || currentKey === undefined) {
+            return
+        }
+
+        const response = await API.deck.action.POST({
+            key: currentKey,
+            action: selectedAction
+        })
+
+        if (!response.status) {
+            SwalAlert({
+                icon: 'error',
+                title: response.message
+            })
+            return
+        }
+
+        selectKey(currentKey)
+    }
+
+    $: updateAction(selectedAction)
+
+    const removeAction = async () => {
+        if (currentKey === undefined) {
+            return
+        }
+
+        const response = await API.deck.action.DELETE(currentKey)
+
+        if (!response.status) {
+            SwalAlert({
+                icon: 'error',
+                title: response.message
+            })
+            return
+        }
+
+        selectedAction = undefined
     }
 </script>
 
@@ -139,7 +199,7 @@
         {#if currentKeyData !== undefined}
             {JSON.stringify(currentKeyData)}
             <h2 class="font-poppins text-lg font-medium">Selected key {currentKey}:</h2>
-            <div class="flex flex-col">
+            <div class="flex flex-col gap-2">
                 <div class="flex gap-2">
                     <FileInput
                         class="rounded-lg bg-primary px-2 py-1 text-center font-poppins text-lg font-medium text-white transition-colors duration-200 hover:bg-secondary"
@@ -151,6 +211,23 @@
                         <button title="Remove icon" on:click={removeIcon} class="rounded-lg bg-red-500 px-2.5 py-1 transition-colors duration-200 hover:bg-red-600">
                             <Icon class="text-white" name="bi-trash-fill" />
                         </button>
+                    {/if}
+                </div>
+                <div class="flex flex-col gap-2">
+                    {#if actionsNames !== undefined}
+                        <h2 class="font-ubuntu text-lg font-bold">Select action</h2>
+                        <div class="flex flex-row gap-2">
+                            <Select bind:value={selectedAction}>
+                                {#each actions as action}
+                                    <option value={action}>{actionsNames[action]}</option>
+                                {/each}
+                            </Select>
+                            {#if selectedAction !== undefined}
+                                <button title="Remove action" on:click={removeAction} class="rounded-lg bg-red-500 px-2.5 py-1 transition-colors duration-200 hover:bg-red-600">
+                                    <Icon class="text-white" name="bi-trash-fill" />
+                                </button>
+                            {/if}
+                        </div>
                     {/if}
                 </div>
             </div>
