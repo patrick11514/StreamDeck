@@ -1,5 +1,5 @@
 import { invoke } from '@tauri-apps/api/core';
-import { type DeckListItem, type StreamDeck } from './StreamDeck/main';
+import { type DeckListItem, type StreamDeck } from './StreamDeck/main.svelte';
 import { toastError } from './utils';
 
 let currentInstance = $state<StreamDeck>();

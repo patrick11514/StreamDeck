@@ -16,7 +16,7 @@ export type DeckInfo = {
 
 export class StreamDeck {
   private deckInfo: DeckInfo | null = null;
-  private connected = false;
+  public connected = $state(false);
 
   constructor(private selectedDeck: DeckListItem) {}
 
@@ -39,6 +39,20 @@ export class StreamDeck {
     } catch (e) {
       this.connected = false;
       console.error(e);
+    }
+  }
+
+  getButtonLayout() {
+    if (!this.deckInfo) return [0, 0];
+    switch (this.deckInfo.kind) {
+      case 'Mini':
+        return [2, 3];
+      case 'MK2':
+      case 'Original':
+      case 'Original V2':
+        return [3, 5];
+      case 'XL':
+        return [4, 8];
     }
   }
 }

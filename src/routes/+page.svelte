@@ -2,7 +2,7 @@
   import Button from '$/lib/components/ui/button/button.svelte';
   import * as Select from '$/lib/components/ui/select';
   import { deckSelect, getCurrentInstance, setCurrentInstance } from '$/lib/store.svelte';
-  import { StreamDeck, type DeckListItem } from '$/lib/StreamDeck/main';
+  import { StreamDeck, type DeckListItem } from '$/lib/StreamDeck/main.svelte';
   import { goto } from '$app/navigation';
   import { Loader, RotateCcw } from '@lucide/svelte/icons';
 

@@ -27,7 +27,8 @@ export default ts.config(
   },
   {
     rules: {
-      'no-console': ['error', { allow: ['warn', 'error'] }]
+      'no-console': ['error', { allow: ['warn', 'error'] }],
+      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }]
     }
   },
   {
