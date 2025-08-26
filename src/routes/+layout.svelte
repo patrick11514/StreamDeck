@@ -1,14 +1,21 @@
 <script lang="ts">
-    import "../app.css"
-    import "../fonts.css"
+  import { Toaster } from '$/lib/components/ui/sonner';
+  import '../app.css';
+  import '../fonts.css';
 
-    import type { LayoutProps } from "./$types"
+  import { deckSelect } from '$/lib/store.svelte';
+  import { onMount } from 'svelte';
+  import type { LayoutProps } from './$types';
 
-    const { children }: LayoutProps = $props()
+  const { children }: LayoutProps = $props();
+
+  onMount(deckSelect.fetchDecks);
 </script>
 
+<Toaster />
+
 <main
-    class="min-h-screen font-loto gap-2 h-full w-full flex flex-col items-center justify-center bg-background text-foreground dark overflow-x-hidden"
+  class="font-loto bg-background text-foreground dark flex h-full min-h-screen w-full flex-col items-center justify-center gap-2 overflow-x-hidden"
 >
-    {@render children()}
+  {@render children()}
 </main>

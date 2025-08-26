@@ -1,44 +1,60 @@
 <script lang="ts">
-    import Button from "$/lib/components/ui/button/button.svelte"
-    import * as Select from "$/lib/components/ui/select"
-    import { invoke } from "@tauri-apps/api/core"
-    import { onMount } from "svelte"
+  import Button from '$/lib/components/ui/button/button.svelte';
+  import * as Select from '$/lib/components/ui/select';
+  import { deckSelect, getCurrentInstance, setCurrentInstance } from '$/lib/store.svelte';
+  import { StreamDeck, type DeckListItem } from '$/lib/StreamDeck/main';
+  import { goto } from '$app/navigation';
+  import { Loader, RotateCcw } from '@lucide/svelte/icons';
 
-    type Deck = {
-        vid: number
-        pid: number
-        serial: string
-        product: string
+  const deckToString = (deck: DeckListItem) => {
+    return `${deck.product} (${deck.serial})`;
+  };
+
+  const setStreamdeck = () => {
+    const found = deckSelect.list!.find((d) => d.serial === deckSelect.selected);
+    if (!found) return;
+
+    const streamdeck = new StreamDeck(found);
+
+    setCurrentInstance(streamdeck);
+
+    streamdeck.connect();
+  };
+
+  $effect(() => {
+    if (deckSelect.selected) {
+      setStreamdeck();
     }
+  });
 
-    let decks = $state() as Promise<Deck[]>
-    let selected_deck = $state<string>()
+  let instance = $derived(getCurrentInstance());
 
-    onMount(() => {
-        decks = invoke("get_streamdecks")
-    })
-
-    const deckToString = (deck: Deck) => {
-        return `${deck.product} (${deck.serial})`
+  $effect(() => {
+    if (instance) {
+      goto('/deck');
     }
+  });
 </script>
 
-{#await decks}
-    LOADING
-{:then _decks}
-    <Select.Root type="single" bind:value={selected_deck}>
-        <Select.Trigger>
-            {selected_deck
-                ? deckToString(_decks.find((d) => d.serial === selected_deck)!)
-                : "Select Deck"}
-        </Select.Trigger>
-        <Select.Content>
-            {#each _decks as deck}
-                <Select.Item value={deck.serial}>
-                    {deckToString(deck)}
-                </Select.Item>
-            {/each}
-        </Select.Content>
+{#if !deckSelect.list}
+  <Loader class="animate-spin" />
+{:else}
+  <section class="flex flex-row gap-2">
+    <Select.Root type="single" bind:value={deckSelect.selected}>
+      <Select.Trigger>
+        {deckSelect.selected
+          ? deckToString(deckSelect.list.find((d) => d.serial === deckSelect.selected)!)
+          : 'Select Deck'}
+      </Select.Trigger>
+      <Select.Content>
+        {#each deckSelect.list as deck (deck.serial)}
+          <Select.Item value={deck.serial}>
+            {deckToString(deck)}
+          </Select.Item>
+        {/each}
+      </Select.Content>
     </Select.Root>
-    <Button disabled={!selected_deck} onclick={console.log}>Continue</Button>
-{/await}
+
+    <Button variant="outline" onclick={deckSelect.fetchDecks}><RotateCcw /></Button>
+  </section>
+{/if}
