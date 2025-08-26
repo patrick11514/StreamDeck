@@ -78,9 +78,9 @@
           {#each Array.from({ length: layout[0] }) as _row, row (row)}
             <div class="flex flex-row gap-2">
               {#each Array.from({ length: layout[1] }) as _col, col (`${row}x${col}`)}
-                <Card.Root>
+                <Button class="aspect-square h-auto w-26" variant="secondary">
                   <Card.Content>{row}x{col}</Card.Content>
-                </Card.Root>
+                </Button>
               {/each}
             </div>
           {/each}
