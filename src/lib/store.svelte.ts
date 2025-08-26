@@ -4,7 +4,7 @@ import { toastError } from './utils';
 
 let currentInstance = $state<StreamDeck>();
 
-export const setCurrentInstance = (instance: StreamDeck) => {
+export const setCurrentInstance = (instance?: StreamDeck) => {
   currentInstance = instance;
 };
 

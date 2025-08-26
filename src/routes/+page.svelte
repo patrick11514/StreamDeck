@@ -30,7 +30,7 @@
   let instance = $derived(getCurrentInstance());
 
   $effect(() => {
-    if (instance) {
+    if (instance && instance.connected) {
       goto('/deck');
     }
   });
@@ -44,7 +44,7 @@
       <Select.Trigger>
         {deckSelect.selected
           ? deckToString(deckSelect.list.find((d) => d.serial === deckSelect.selected)!)
-          : 'Select Deck'}
+          : 'Select Deck to connect'}
       </Select.Trigger>
       <Select.Content>
         {#each deckSelect.list as deck (deck.serial)}

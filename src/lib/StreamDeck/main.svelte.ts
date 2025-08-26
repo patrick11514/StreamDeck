@@ -15,10 +15,10 @@ export type DeckInfo = {
 };
 
 export class StreamDeck {
-  private deckInfo: DeckInfo | null = null;
+  public deckInfo: DeckInfo | null = null;
   public connected = $state(false);
 
-  constructor(private selectedDeck: DeckListItem) {}
+  constructor(public readonly selectedDeck: DeckListItem) {}
 
   //Method to connect to selected streamdeck via HIDAPI through Tauri
   async connect() {
@@ -53,6 +53,18 @@ export class StreamDeck {
         return [3, 5];
       case 'XL':
         return [4, 8];
+    }
+  }
+
+  async disconnect() {
+    try {
+      await invoke('close_streamdeck');
+      this.connected = false;
+      toastSuccess(
+        `Successfully disconnected from StreamDeck (${this.selectedDeck.serial})`
+      );
+    } catch (e) {
+      console.error(e);
     }
   }
 }
