@@ -2,15 +2,26 @@
   import Button from '$/lib/components/ui/button/button.svelte';
   import * as Card from '$/lib/components/ui/card';
   import * as DropdownMenu from '$/lib/components/ui/dropdown-menu';
+  import Slider from '$/lib/components/ui/slider/slider.svelte';
   import { deckSelect, getCurrentInstance } from '$/lib/store.svelte';
   import { goto } from '$app/navigation';
-  import { ChevronDown, Loader } from '@lucide/svelte';
+  import { ChevronDown, Loader, Sun } from '@lucide/svelte';
 
   const deck = getCurrentInstance();
 
   if (!deck) {
     goto('/');
   }
+
+  let brightness = $state((await deck?.getBrightness()) ?? 100);
+  let timeout: number;
+
+  const onBrightnessChange = () => {
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      deck?.setBrightness(brightness);
+    }, 500);
+  };
 </script>
 
 {#if deck && deck.connected && deck.deckInfo}
@@ -19,7 +30,7 @@
   <div class="divide-border flex w-full flex-1 flex-row gap-4 divide-x-2 p-8">
     <div class="divide-border flex flex-1 flex-col gap-2 divide-y-2">
       <div class="flex flex-1/2 flex-col gap-2">
-        <div>
+        <div class="flex justify-between">
           <DropdownMenu.Root>
             <DropdownMenu.Trigger class="cursor-pointer font-bold">
               {#snippet child({ props })}
@@ -50,6 +61,18 @@
               </DropdownMenu.Group>
             </DropdownMenu.Content>
           </DropdownMenu.Root>
+          <div
+            class="bg-secondary mr-8 flex w-1/4 items-center justify-center gap-2 rounded-md px-2 py-1"
+          >
+            <Sun /> Brightness: <Slider
+              type="single"
+              min={0}
+              max={100}
+              bind:value={brightness}
+              onValueChange={onBrightnessChange}
+            />
+            <span class="text-muted-foreground min-w-10">{brightness}%</span>
+          </div>
         </div>
         <div class="mx-auto flex flex-col gap-2">
           {#each Array.from({ length: layout[0] }) as _row, row (row)}

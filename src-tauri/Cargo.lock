@@ -4176,6 +4176,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "anyhow-tauri",
+ "dirs",
  "hidapi",
  "serde",
  "serde_json",
@@ -4183,6 +4184,7 @@ dependencies = [
  "tauri",
  "tauri-build",
  "tauri-plugin-opener",
+ "toml 0.9.5",
 ]
 
 [[package]]

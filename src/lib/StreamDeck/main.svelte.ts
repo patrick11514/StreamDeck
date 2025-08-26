@@ -67,4 +67,20 @@ export class StreamDeck {
       console.error(e);
     }
   }
+
+  async getBrightness() {
+    if (!this.connected) return 100;
+
+    const brightness = await invoke<number>('get_brightness');
+    return brightness;
+  }
+
+  async setBrightness(brightness: number) {
+    if (!this.connected) return false;
+
+    await invoke('set_brightness', { brightness });
+
+    toastSuccess(`Set brightness to ${brightness}%`);
+    return true;
+  }
 }
