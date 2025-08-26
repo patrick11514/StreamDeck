@@ -15,7 +15,7 @@
 <Toaster />
 
 <main
-  class="font-loto bg-background text-foreground dark flex h-full min-h-screen w-full flex-col items-center justify-center gap-2 overflow-x-hidden"
+  class="font-loto bg-background text-foreground flex h-full min-h-screen w-full flex-col items-center justify-center gap-2 overflow-x-hidden"
 >
   {@render children()}
 </main>
