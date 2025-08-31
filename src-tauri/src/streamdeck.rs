@@ -225,6 +225,10 @@ pub fn set_brightness(
         config.brightness = brightness;
 
         config::write_config(&deck.all_config).into_ta_result()?;
+        deck.current
+            .deck
+            .set_brightness(brightness)
+            .into_ta_result()?;
         return Ok(true);
     }
 
