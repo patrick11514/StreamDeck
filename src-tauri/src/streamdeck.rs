@@ -1,13 +1,15 @@
 use std::{
+    fs::{self, File},
+    io::Write,
     mem,
     sync::{Arc, Mutex},
 };
 
 use anyhow_tauri::IntoTAResult;
 use hidapi::HidApi;
-use streamdeck::Kind;
+use streamdeck::{DeviceImage, Kind};
 
-use crate::config::{self, MultiDeviceConfig};
+use crate::config::{self, get_config_dir, MultiDeviceConfig};
 
 #[derive(Clone, serde::Serialize)]
 pub struct DeckInfo {
@@ -233,4 +235,37 @@ pub fn set_brightness(
     }
 
     return Ok(false);
+}
+
+#[tauri::command]
+pub fn send_image(
+    ctx: tauri::State<SharedState>,
+    key: u8,
+    image: Vec<u8>,
+) -> anyhow_tauri::TAResult<()> {
+    let mut mgr = ctx.lock().unwrap();
+    let deck = match &mut *mgr {
+        DeckManager::Connected(deck) => &mut deck.current.deck,
+        DeckManager::NotConnected(_) => {
+            return Err(anyhow::anyhow!("No device connected")).into_ta_result()
+        }
+    };
+
+    let keys = deck.kind().keys();
+    if key <= 0 || key > keys {
+        return Err(anyhow::anyhow!("Invalid key index")).into_ta_result();
+    }
+
+    let config_dir = get_config_dir().unwrap();
+    let image_path = config_dir.join(format!("button_{}.png", key));
+
+    let mut file = File::create(&image_path).into_ta_result()?;
+    file.write(image.as_slice()).into_ta_result()?;
+
+    let options = streamdeck::ImageOptions::new(None, false);
+
+    deck.set_button_file(key, image_path.to_str().unwrap(), &options)
+        .into_ta_result()?;
+
+    Ok(())
 }

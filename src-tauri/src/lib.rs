@@ -15,7 +15,8 @@ pub fn run() {
             streamdeck::open_streamdeck,
             streamdeck::close_streamdeck,
             streamdeck::set_brightness,
-            streamdeck::get_brightness
+            streamdeck::get_brightness,
+            streamdeck::send_image
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
