@@ -6,16 +6,21 @@
   import { deckSelect, getCurrentInstance } from '$/lib/store.svelte';
   import { goto } from '$app/navigation';
   import { ChevronDown, ImageIcon, Loader, Sun } from '@lucide/svelte';
+  import { onMount } from 'svelte';
   import Cropper from 'svelte-easy-crop';
 
-  const deck = getCurrentInstance();
+  const deck = $derived(getCurrentInstance());
 
-  if (!deck) {
-    goto('/');
-  }
-
-  let brightness = $state((await deck?.getBrightness()) ?? 100);
+  let brightness = $state(100);
   let timeout: number;
+
+  onMount(async () => {
+    if (!deck && deckSelect.selected === undefined) {
+      goto('/');
+    } else if (deck && deck.connected) {
+      brightness = await deck.getBrightness();
+    }
+  });
 
   const onBrightnessChange = () => {
     if (timeout) clearTimeout(timeout);
@@ -77,6 +82,7 @@
     bind:files={inputValue}
     accept="image/*"
   />
+
   <div class="divide-border flex w-full flex-1 flex-row gap-4 divide-x-2 p-8">
     <div class="divide-border flex flex-1 flex-col gap-2 divide-y-2">
       <div class="flex flex-1/2 flex-col gap-2">
@@ -178,7 +184,7 @@
             </div>
           </div>
         {:else}
-          Please select a tile for configuration
+          Please select a tile for configuration.
         {/if}
       </div>
     </div>

@@ -15,11 +15,6 @@ const config = {
     alias: {
       '$/*': './src/*'
     }
-  },
-  compilerOptions: {
-    experimental: {
-      async: true
-    }
   }
 };
 
