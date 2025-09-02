@@ -36,7 +36,7 @@
   });
 </script>
 
-{#if !deckSelect.list}
+{#if !deckSelect.list || deckSelect.selected}
   <Loader class="animate-spin" />
 {:else}
   <section class="flex flex-row gap-2">
